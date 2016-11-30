@@ -1,20 +1,20 @@
 'use strict';
 
-var React = require('react');
-var ReactNative = require('react-native');
+import React, {Component} from 'react';
+import {NavigatorIOS, StyleSheet, AppRegistry} from 'react-native';
 
-var SearchPage = require('./SearchPage');
+let SearchPage = require('./SearchPage');
 
-var styles = ReactNative.StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1
   }
 });
 
-class PropertyFinderApp extends React.Component {
+class PropertyFinderApp extends Component {
   render() {
     return (
-      <ReactNative.NavigatorIOS
+      <NavigatorIOS
         style={styles.container}
         initialRoute={{
           title: 'Property Finder',
@@ -24,4 +24,4 @@ class PropertyFinderApp extends React.Component {
   }
 }
 
-ReactNative.AppRegistry.registerComponent('PropertyFinder', function() { return PropertyFinderApp });
+AppRegistry.registerComponent('PropertyFinder', function() { return PropertyFinderApp });
