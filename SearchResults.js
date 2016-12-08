@@ -44,7 +44,7 @@ class SearchResults extends Component {
 
   constructor(props) {
     super(props);
-    var dataSource = new ListViewDataSource(
+    var dataSource = new ListView.DataSource(
       {rowHasChanged: (r1, r2) => r1.lister_url !== r2.lister_url});
     this.state = {
       dataSource: dataSource.cloneWithRows(this.props.listings)
