@@ -45,25 +45,23 @@ class SearchResults extends Component {
   constructor(props) {
     super(props);
     var dataSource = new ListView.DataSource(
-      {rowHasChanged: (r1, r2) => r1.lister_url !== r2.lister_url});
+      {rowHasChanged: (r1, r2) => r1.id !== r2.id});
     this.state = {
       dataSource: dataSource.cloneWithRows(this.props.listings)
     };
   }
 
   renderRow(rowData, sectionID, rowID) {
-    var price = rowData.price_formatted.split(' ')[0];
-
     return (
-      <TouchableHighlight onPress={() => this.rowPressed(rowData.lister_url)}
+      <TouchableHighlight onPress={() => this.rowPressed(rowData.id)}
           underlayColor='#dddddd'>
         <View>
           <View style={styles.rowContainer}>
-            <Image style={styles.thumb} source={{ uri: rowData.img_url }} />
+         
             <View  style={styles.textContainer}>
-              <Text style={styles.price}>{price}</Text>
+            
               <Text style={styles.title}
-                    numberOfLines={1}>{rowData.title}</Text>
+                    numberOfLines={1}>{rowData.marketname}</Text>
             </View>
           </View>
           <View style={styles.separator}/>
@@ -73,12 +71,12 @@ class SearchResults extends Component {
   }
 
   rowPressed(listerURL) {
-    var property = this.props.listings.filter(prop => prop.lister_url === listerURL)[0];
+    var market = this.props.listings.filter(prop => prop.id === listerURL)[0];
 
     this.props.navigator.push({
-      title: "Property",
+      title: "market",
       component: PropertyView,
-      passProps: {property: property}
+      passProps: {market: market}
     });
   }
 

@@ -17,7 +17,7 @@ class PropertyFinderApp extends Component {
       <NavigatorIOS
         style={styles.container}
         initialRoute={{
-          title: 'Property Finder',
+          title: 'Farmer\'s Market Finder',
           component: SearchPage,
         }}/>
     );

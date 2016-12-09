@@ -64,47 +64,57 @@ var styles = StyleSheet.create({
   }
 });
 
-function urlForQueryAndPage(key, value, pageNumber) {
+//Build url for request
+var requestUrl = function (key, value, zip) {
   var data = {
-      country: 'uk',
-      pretty: '1',
-      encoding: 'json',
-      listing_type: 'buy',
-      action: 'search_listings',
-      page: pageNumber
+      zip: zip,
   };
   data[key] = value;
-
-  var querystring = Object.keys(data)
-    .map(key => key + '=' + encodeURIComponent(data[key]))
-    .join('&');
-
-  return 'http://api.nestoria.co.uk/api?' + querystring;
+  return 'https://search.ams.usda.gov/farmersmarkets/v1/data.svc/zipSearch?zip=' + data.zip;
 };
 
 class SearchPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchString: 'london',
+      searchZip: '',
       isLoading: false,
       message: ''
     };
   }
 
-  onSearchTextChanged(event) {
-    console.log('onSearchTextChanged');
-    this.setState({ searchString: event.nativeEvent.text });
-    console.log(this.state.searchString);
+  onSearchZipChanged(event) {
+    console.log('onSearchZipChanged');
+    this.setState({ searchZip: event.nativeEvent.text });
+    console.log(this.state.searchZip);
   }
 
   _executeQuery(query) {
     console.log(query);
     this.setState({ isLoading: true });
+  
+    var myInit;
+    var myRequest;
+    var httpHeaders = { 'Content-Type' : 'application/json', 'Accept-Charset' : 'utf-8', 'dataType' : 'jsonp',  'url': query };
+    var myHeaders = new Headers(httpHeaders);
 
-    fetch(query)
-    .then(response => response.json())
-    .then(json => this._handleResponse(json.response))
+    console.log(myHeaders.get('url'));
+
+    // myInit = { method: 'GET',
+    //            headers: myHeaders,
+    //           };
+
+
+
+    // myRequest = new Request(myInit);
+
+    // console.log(myRequest);
+    var response;
+
+    fetch({method: 'GET', headers: myRequest, url: query })
+    .then(response => this._handleResponse(response.json()), this.setState({
+      message: 'Its Gucci'
+    }))
     .catch(error =>
        this.setState({
         isLoading: false,
@@ -113,37 +123,26 @@ class SearchPage extends Component {
   }
 
   _handleResponse(response) {
+  
     this.setState({ isLoading: false , message: '' });
-    if (response.application_response_code.substr(0, 1) === '1') {
-      this.props.navigator.push({
-        title: 'Results',
-        component: SearchResults,
-        passProps: {listings: response.listings}
-      });
-    } else {
-      this.setState({ message: 'Location not recognized; please try again.'});
-    }
+    console.log(response);
+    // if (response.application_response_code.substr(0, 1) === '1') {
+    //   this.props.navigator.push({
+    //     title: 'Results',
+    //     component: SearchResults,
+    //     passProps: {listings: response.listings}
+    //   });
+    // } else {
+    //   this.setState({ message: 'Location not recognized; please try again.'});
+    // }
   }
 
   onSearchPressed() {
-    var query = urlForQueryAndPage('place_name', this.state.searchString, 1);
+    var query = requestUrl('zip', this.state.searchZip);
     this._executeQuery(query);
   }
 
-  onLocationPressed() {
-    navigator.geolocation.getCurrentPosition(
-      location => {
-        var search = location.coords.latitude + ',' + location.coords.longitude;
-        this.setState({ searchString: search });
-        var query = urlForQueryAndPage('centre_point', search, 1);
-        this._executeQuery(query);
-      },
-      error => {
-        this.setState({
-          message: 'There was a problem with obtaining your location: ' + error
-        });
-      });
-  }
+
 
   render() {
     console.log('SearchPage.render');
@@ -156,17 +155,14 @@ class SearchPage extends Component {
     return (
       <View style={styles.container}>
         <Text style={styles.description}>
-          Search for houses to buy!
+          Search for local Farmer Markets By Zip Code!
         </Text>
-        <TextInput
-          style={styles.searchInput}
-          value={this.state.searchString}
-          onChange={this.onSearchTextChanged.bind(this)}
-          placeholder='Search via name or postcode'/>
+
         <View style={styles.flowRight}>
           <TextInput
             style={styles.searchInput}
-            placeholder='Search via name or postcode'/>
+            onChange={this.onSearchZipChanged.bind(this)}
+            placeholder='Search via zip'/>
           <TouchableHighlight style={styles.button}
               underlayColor='#99d9f4'>
             <Text
@@ -176,12 +172,7 @@ class SearchPage extends Component {
             </Text>
           </TouchableHighlight>
         </View>
-        <TouchableHighlight
-          style={styles.button}
-          onPress={this.onLocationPressed.bind(this)}
-          underlayColor='#99d9f4'>
-          <Text style={styles.buttonText}>Location</Text>
-        </TouchableHighlight>
+    
         <Image source={require('./Resources/house.png')} style={styles.image}/>
         {spinner}
         <Text style={styles.description}>{this.state.message}</Text>
