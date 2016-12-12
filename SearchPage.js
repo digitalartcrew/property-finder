@@ -93,27 +93,14 @@ class SearchPage extends Component {
     console.log(query);
     this.setState({ isLoading: true });
   
-    var myInit;
-    var myRequest;
-    var httpHeaders = { 'Content-Type' : 'application/json', 'Accept-Charset' : 'utf-8', 'dataType' : 'jsonp',  'url': query };
-    var myHeaders = new Headers(httpHeaders);
 
-    console.log(myHeaders.get('url'));
-
-    // myInit = { method: 'GET',
-    //            headers: myHeaders,
-    //           };
-
-
-
-    // myRequest = new Request(myInit);
-
-    // console.log(myRequest);
     var response;
+    var json;
 
-    fetch({method: 'GET', headers: myRequest, url: query })
-    .then(response => this._handleResponse(response.json()), this.setState({
-      message: 'Its Gucci'
+    fetch({method: 'GET', url: query })
+    .then(response => response.json().then(json => this._handleResponse(json)), this.setState({
+      isLoading: true,
+      message: 'Searching for markets...',
     }))
     .catch(error =>
        this.setState({
@@ -125,16 +112,18 @@ class SearchPage extends Component {
   _handleResponse(response) {
   
     this.setState({ isLoading: false , message: '' });
-    console.log(response);
-    // if (response.application_response_code.substr(0, 1) === '1') {
-    //   this.props.navigator.push({
-    //     title: 'Results',
-    //     component: SearchResults,
-    //     passProps: {listings: response.listings}
-    //   });
-    // } else {
-    //   this.setState({ message: 'Location not recognized; please try again.'});
-    // }
+
+
+    if (response) {
+      this.props.navigator.push({
+        title: 'Results',
+        component: SearchResults,
+        passProps: {markets: response}
+      });
+     
+    } else {
+      this.setState({ message: 'Location not recognized; please try again.'});
+    }
   }
 
   onSearchPressed() {

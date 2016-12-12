@@ -45,13 +45,18 @@ class SearchResults extends Component {
   constructor(props) {
     super(props);
     var dataSource = new ListView.DataSource(
-      {rowHasChanged: (r1, r2) => r1.id !== r2.id});
+      {rowHasChanged: (r1, r2) => r1 !== r2});
+    console.log(this.props.markets.results);
+    //Bring back object with array 
+  
     this.state = {
-      dataSource: dataSource.cloneWithRows(this.props.listings)
+      dataSource: dataSource.cloneWithRows(this.props.markets.results)
     };
   }
 
   renderRow(rowData, sectionID, rowID) {
+    console.log(rowData);
+    //Returns market objects
     return (
       <TouchableHighlight onPress={() => this.rowPressed(rowData.id)}
           underlayColor='#dddddd'>
@@ -70,11 +75,13 @@ class SearchResults extends Component {
     );
   }
 
-  rowPressed(listerURL) {
-    var market = this.props.listings.filter(prop => prop.id === listerURL)[0];
+  rowPressed(id) {
+    console.log(id);
+    var market = this.props.markets.results.filter(prop => prop.id === id )[0];
+    
 
     this.props.navigator.push({
-      title: "market",
+      title: "Market Results",
       component: PropertyView,
       passProps: {market: market}
     });
